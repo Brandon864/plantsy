@@ -10,14 +10,14 @@ function App() {
 
   // Fetch plants on mount
   useEffect(() => {
-    fetch("http://localhost:6001/plants")
+    fetch("https://plantsy-jsonserver.vercel.app//plants")
       .then((response) => response.json())
       .then((data) => setPlants(data));
   }, []);
 
   // Add a new plant
   const addPlant = (newPlant) => {
-    fetch("http://localhost:6001/plants", {
+    fetch("https://plantsy-jsonserver.vercel.app//plants", {
       method: "POST",
       headers: {
         "Content-Type": "application/json",

@@ -13,7 +13,7 @@ function PlantCard({ plant, plants, setPlants }) {
   };
 
   const updatePrice = () => {
-    fetch(`http://localhost:6001/plants/${plant.id}`, {
+    fetch(`https://plantsy-jsonserver.vercel.app//${plant.id}`, {
       method: "PATCH",
       headers: {
         "Content-Type": "application/json",
@@ -30,7 +30,7 @@ function PlantCard({ plant, plants, setPlants }) {
   };
 
   const deletePlant = () => {
-    fetch(`http://localhost:6001/plants/${plant.id}`, {
+    fetch(`https://plantsy-jsonserver.vercel.app//plants/${plant.id}`, {
       method: "DELETE",
     }).then(() => {
       setPlants(plants.filter((p) => p.id !== plant.id));
