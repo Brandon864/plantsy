@@ -1,0 +1,16 @@
+{
+    "plants": [
+      {
+        "id": 1,
+        "name": "Aloe",
+        "image": "https://images.unsplash.com/photo-1599819177738-4a13b509992d?ixlib=rb-4.0.3&auto=format&fit=crop&w=500&q=60",
+        "price": 15.99
+      },
+      {
+        "id": 2,
+        "name": "ZZ Plant",
+        "image": "https://images.unsplash.com/photo-1614594975525-963e6e2b92a7?ixlib=rb-4.0.3&auto=format&fit=crop&w=500&q=60",
+        "price": 25.98
+      }
+    ]
+  }
