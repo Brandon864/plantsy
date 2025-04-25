@@ -10,14 +10,23 @@ function App() {
 
   // Fetch plants on mount
   useEffect(() => {
-    fetch("https://plantsy-jsonserver.vercel.app//plants")
-      .then((response) => response.json())
-      .then((data) => setPlants(data));
+    fetch("https://plantsy-jsonserver.vercel.app/plants")
+      .then((response) => {
+        if (!response.ok) {
+          throw new Error("Network response was not ok");
+        }
+        return response.json();
+      })
+      .then((data) => setPlants(data))
+      .catch((error) => {
+        console.error("Fetch error:", error);
+        setPlants([]); // Fallback to empty array
+      });
   }, []);
 
   // Add a new plant
   const addPlant = (newPlant) => {
-    fetch("https://plantsy-jsonserver.vercel.app//plants", {
+    fetch("https://plantsy-jsonserver.vercel.app/plants", {
       method: "POST",
       headers: {
         "Content-Type": "application/json",
@@ -25,7 +34,8 @@ function App() {
       body: JSON.stringify(newPlant),
     })
       .then((response) => response.json())
-      .then((data) => setPlants([...plants, data]));
+      .then((data) => setPlants([...plants, data]))
+      .catch((error) => console.error("Error adding plant:", error));
   };
 
   // Filter plants by search term
