@@ -1,5 +1,21 @@
-import { render, screen, waitFor } from "@testing-library/react";
-import App from "../src/App";
+const { expect } = require("chai");
+const { render, screen, waitFor } = require("@testing-library/react");
+const App = require("../src/App").default;
+
+// Add toBeInTheDocument to Chai
+const toBeInTheDocument = function () {
+  const { actual } = this;
+  const pass = actual && actual.isConnected;
+  this.assert(
+    pass,
+    "expected element to be in the document",
+    "expected element not to be in the document",
+    actual
+  );
+};
+require("chai").use((chai) => {
+  chai.Assertion.addMethod("toBeInTheDocument", toBeInTheDocument);
+});
 
 // Mock data
 const mockPlants = [
@@ -17,9 +33,9 @@ const mockPlants = [
   },
 ];
 
-// Mock fetch before each test
+// Mock fetch
 beforeEach(() => {
-  jest.spyOn(global, "fetch").mockImplementation(() =>
+  global.fetch = () =>
     Promise.resolve({
       ok: true,
       status: 200,
@@ -27,60 +43,54 @@ beforeEach(() => {
         get: (header) => (header === "content-type" ? "application/json" : null),
       },
       json: () => Promise.resolve(mockPlants),
-    })
-  );
+    });
 });
 
-// Clean up after each test
 afterEach(() => {
-  jest.restoreAllMocks();
+  global.fetch = undefined;
 });
 
-test("renders Plantsy header", () => {
-  render(<App />);
-  const headerElement = screen.getByText(/plantsy/i);
-  expect(headerElement).toBeInTheDocument();
-});
+describe("App", () => {
+  it("renders Plantsy header", () => {
+    render(<App />);
+    const headerElement = screen.getByText(/plantsy/i);
+    expect(headerElement).toBeInTheDocument();
+  });
 
-test("renders search bar", () => {
-  render(<App />);
-  const searchLabel = screen.getByLabelText(/search plants/i);
-  expect(searchLabel).toBeInTheDocument();
-  const searchInput = screen.getByPlaceholderText(/type a name to search/i);
-  expect(searchInput).toBeInTheDocument();
-});
+  it("renders search bar", () => {
+    render(<App />);
+    const searchLabel = screen.getByLabelText(/search plants/i);
+    expect(searchLabel).toBeInTheDocument();
+    const searchInput = screen.getByPlaceholderText(/type a name to search/i);
+    expect(searchInput).toBeInTheDocument();
+  });
 
-test("renders new plant form", () => {
-  render(<App />);
-  const formHeader = screen.getByText(/new plant/i);
-  expect(formHeader).toBeInTheDocument();
-  const nameInput = screen.getByPlaceholderText(/plant name/i);
-  expect(nameInput).toBeInTheDocument();
-  const imageInput = screen.getByPlaceholderText(/image url/i);
-  expect(imageInput).toBeInTheDocument();
-  const priceInput = screen.getByPlaceholderText(/price/i);
-  expect(priceInput).toBeInTheDocument();
-  const addButton = screen.getByText(/add plant/i);
-  expect(addButton).toBeInTheDocument();
-});
+  it("renders new plant form", () => {
+    render(<App />);
+    const formHeader = screen.getByText(/new plant/i);
+    expect(formHeader).toBeInTheDocument();
+    const nameInput = screen.getByPlaceholderText(/plant name/i);
+    expect(nameInput).toBeInTheDocument();
+    const imageInput = screen.getByPlaceholderText(/image url/i);
+    expect(imageInput).toBeInTheDocument();
+    const priceInput = screen.getByPlaceholderText(/price/i);
+    expect(priceInput).toBeInTheDocument();
+    const addButton = screen.getByText(/add plant/i);
+    expect(addButton).toBeInTheDocument();
+  });
 
-test("fetches and renders plants", async () => {
-  render(<App />);
+  it("fetches and renders plants", async () => {
+    render(<App />);
 
-  // Verify the fetch call was made with the correct URL
-  expect(global.fetch).toHaveBeenCalledWith("https://plantsy-jsonserver.vercel.app/plants");
+    expect(global.fetch).toHaveBeenCalledWith("https://plantsy-jsonserver.vercel.app/plants");
 
-  // Wait for the plants to be fetched and rendered
-  await waitFor(() => {
-    expect(screen.getByText(/aloe/i)).toBeInTheDocument();
-    expect(screen.getByText(/zz plant/i)).toBeInTheDocument();
-  }, { timeout: 2000 });
+    await waitFor(() => {
+      expect(screen.getByText(/aloe/i)).toBeInTheDocument();
+      expect(screen.getByText(/zz plant/i)).toBeInTheDocument();
+    }, { timeout: 2000 });
 
-  // Check for plant details
-  expect(screen.getByText(/price: \$15.99/i)).toBeInTheDocument();
-  expect(screen.getByText(/price: \$25.98/i)).toBeInTheDocument();
-  expect(screen.getAllByText(/in stock/i)).toHaveLength(2); // Both plants start "In Stock"
-});
-test("minimal test", () => {
-  expect(true).toBe(true);
+    expect(screen.getByText(/price: \$15.99/i)).toBeInTheDocument();
+    expect(screen.getByText(/price: \$25.98/i)).toBeInTheDocument();
+    expect(screen.getAllByText(/in stock/i)).to.have.lengthOf(2);
+  });
 });
